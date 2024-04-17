@@ -30,4 +30,4 @@ protoc --go_out=proto --go_opt=paths=source_relative --go-grpc_out=proto --go-gr
 
 ## Desenho
 
-[image](./images/online-chat-grpc.png)
+![image](./images/online-chat-grpc.png)
