@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+option go_package = "godoy/onlinechat/proto";
+
+
+message UserStatusChange {
+    string username = 1;
+    enum Status {
+        ONLINE = 0;
+        OFFLINE = 1;
+    }
+    Status new_status = 2;
+}
+
+message ChatMessage {
+    string sender_username = 1;
+    string message_text = 2;
+}
+
+message ChatMessageResponse {
+    bool ok = 1;
+    string err = 2;
+}
+
+// Define the service for the chat server
+service ChatService {
+    rpc UpdateUserStatus(UserStatusChange) returns (stream ChatMessage) {}
+    rpc SendMessage(ChatMessage) returns (ChatMessageResponse) {}
+}
