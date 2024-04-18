@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	"google.golang.org/grpc"
 
@@ -16,13 +17,15 @@ import (
 
 func main() {
 	conn, err := grpc.Dial(":50051", grpc.WithInsecure())
+
+	log.Println("Connected")
 	if err != nil {
 		log.Fatalf("can not connect with server %v", err)
 	}
 
+	fmt.Print("Type your username: ")
 	reader := bufio.NewReader(os.Stdin)
 	userName, err := reader.ReadString('\n')
-
 	userName = strings.TrimSpace(userName)
 
 	if err != nil {
@@ -42,34 +45,26 @@ func main() {
 		log.Fatal("Deu ruim")
 	}
 
-	// done := make(chan bool)
-
 	go func() {
 		for {
 			resp, err_n := stream.Recv()
 
 			if err_n == io.EOF {
-				// log.Println("EOF")
+				log.Println("EOF")
 
 			} else if err_n != nil {
-				// log.Println("cannot receive %v", err)
+				log.Fatalf("%v", err_n)
 			}
 
-			if resp.SenderUsername != "" && resp.SenderUsername != userName {
-				fmt.Println(resp.SenderUsername + " : " + resp.MessageText)
-			}
+			fmt.Println(resp.SenderUsername + " : " + resp.MessageText)
 
 		}
 
 	}()
 
 	for {
-		reader := bufio.NewReader(os.Stdin)
-		line, err := reader.ReadString('\n')
-		line = strings.TrimSpace(line)
-		if err != nil {
-			log.Fatal(err)
-		}
-		client.SendMessage(context.Background(), &pb.ChatMessage{SenderUsername: userName, MessageText: line})
+		time.Sleep(1 * time.Second)
+
+		client.SendMessage(context.Background(), &pb.ChatMessage{SenderUsername: userName, MessageText: "debug-message"})
 	}
 }
